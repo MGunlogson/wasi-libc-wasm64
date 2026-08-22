@@ -17,13 +17,20 @@ add_compile_options(
   -Wno-unused-variable
 )
 
+# Determine wasm architecture from TARGET_TRIPLE
+if(TARGET_TRIPLE MATCHES "^wasm64")
+  set(WASM_ARCH wasm64)
+else()
+  set(WASM_ARCH wasm32)
+endif()
+
 # Dummy interface library which helps configure headers/options for internal
 # libraries below.
 add_library(musl-top-half-interface INTERFACE)
 target_include_directories(musl-top-half-interface INTERFACE
   musl/src/include
   musl/src/internal
-  musl/arch/wasm32
+  musl/arch/${WASM_ARCH}
   musl/arch/generic
   headers/private)
 add_dependencies(musl-top-half-interface sysroot_inc)
@@ -39,14 +46,14 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E make_directory ${SYSROOT_INC}/bits
   COMMAND
     ${SED} -f musl/tools/mkalltypes.sed
-      musl/arch/wasm32/bits/alltypes.h.in
+      musl/arch/${WASM_ARCH}/bits/alltypes.h.in
       musl/include/alltypes.h.in
       > ${SYSROOT_INC}/bits/alltypes.h
   WORKING_DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}
   DEPENDS
     musl/tools/mkalltypes.sed
-    musl/arch/wasm32/bits/alltypes.h.in
+    musl/arch/${WASM_ARCH}/bits/alltypes.h.in
     musl/include/alltypes.h.in
 )
 add_custom_target(sysroot-bits-alltypes DEPENDS ${SYSROOT_INC}/bits/alltypes.h)
@@ -57,7 +64,7 @@ file(GLOB_RECURSE globbed_headers RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE
   musl/include/*.h
   # Copy in the musl's "bits" header files.
   musl/arch/generic/bits/*.h
-  musl/arch/wasm32/bits/*.h
+  musl/arch/${WASM_ARCH}/bits/*.h
 )
 
 list(REMOVE_ITEM globbed_headers
@@ -167,8 +174,8 @@ foreach(header ${globbed_headers})
     string(REPLACE "musl/include/" "" dst ${header})
   elseif(${header} MATCHES "^musl/arch/generic/bits/")
     string(REPLACE "musl/arch/generic/" "" dst ${header})
-  elseif(${header} MATCHES "^musl/arch/wasm32/bits/")
-    string(REPLACE "musl/arch/wasm32/" "" dst ${header})
+  elseif(${header} MATCHES "^musl/arch/${WASM_ARCH}/bits/")
+    string(REPLACE "musl/arch/${WASM_ARCH}/" "" dst ${header})
   else()
     message(FATAL_ERROR "Unhandled header file path: ${header}")
   endif()
@@ -446,8 +453,8 @@ if (THREADS)
     musl/src/thread/wasi-threads/sem_timedwait.c
     musl/src/thread/wasi-threads/sem_trywait.c
     musl/src/thread/wasi-threads/sem_wait.c
-    musl/src/thread/wasi-threads/wasi_thread_start.s
-    musl/src/thread/wasi-threads/__wasilibc_busywait.c
+    musl/src/thread/${WASM_ARCH}/wasi_thread_start.s
+    musl/src/thread/${WASM_ARCH}/__wasilibc_busywait.c
   )
 else()
   # pthreads stubs for single-threaded environment
@@ -544,10 +551,10 @@ endforeach()
 # =============================================================================
 # libsetjmp.{a,so}
 #
-add_internal_library_pair(setjmp musl/src/setjmp/wasm32/rt.c)
+add_internal_library_pair(setjmp musl/src/setjmp/${WASM_ARCH}/rt.c)
 
 if (LTO)
-  set_source_files_properties(musl/src/setjmp/wasm32/rt.c
+  set_source_files_properties(musl/src/setjmp/${WASM_ARCH}/rt.c
      PROPERTIES COMPILE_OPTIONS -fno-lto)
 endif()
 

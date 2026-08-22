@@ -27,9 +27,9 @@
 #error <wasi/api.h> is only supported on WASI platforms.
 #endif
 
-// #ifndef __wasm32__
-// #error <wasi/api.h> only supports wasm32; doesn't yet support wasm64
-// #endif
+#if !defined(__wasm32__) && !defined(__wasm64__)
+#error "<wasi/api.h> only supports wasm32/64"
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
@@ -42,7 +42,11 @@ _Static_assert(_Alignof(int32_t) == 4, "non-wasi data layout");
 _Static_assert(_Alignof(uint32_t) == 4, "non-wasi data layout");
 _Static_assert(_Alignof(int64_t) == 8, "non-wasi data layout");
 _Static_assert(_Alignof(uint64_t) == 8, "non-wasi data layout");
-_Static_assert(_Alignof(void *) == sizeof(__SIZE_TYPE__), "non-wasi data layout");
+#if defined(__wasm32__)
+_Static_assert(_Alignof(void *) == 4, "non-wasi data layout");
+#elif defined(__wasm64__)
+_Static_assert(_Alignof(void *) == 8, "non-wasi data layout");
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +55,14 @@ extern "C" {
 // TODO: Encoding this in witx.
 #define __WASI_DIRCOOKIE_START (UINT64_C(0))
 typedef __SIZE_TYPE__ __wasi_size_t;
+
+#if defined(__wasm32__)
+_Static_assert(sizeof(__wasi_size_t) == 4, "witx calculated size");
+_Static_assert(_Alignof(__wasi_size_t) == 4, "witx calculated align");
+#elif defined(__wasm64__)
+_Static_assert(sizeof(__wasi_size_t) == 8, "witx calculated size");
+_Static_assert(_Alignof(__wasi_size_t) == 8, "witx calculated align");
+#endif
 
 /**
  * Non-negative file size or length of a region within a file.
@@ -691,6 +703,18 @@ typedef struct __wasi_iovec_t {
 
 } __wasi_iovec_t;
 
+#if defined(__wasm32__)
+_Static_assert(sizeof(__wasi_iovec_t) == 8, "witx calculated size");
+_Static_assert(_Alignof(__wasi_iovec_t) == 4, "witx calculated align");
+_Static_assert(offsetof(__wasi_iovec_t, buf) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_iovec_t, buf_len) == 4, "witx calculated offset");
+#elif defined(__wasm64__)
+_Static_assert(sizeof(__wasi_iovec_t) == 16, "witx calculated size");
+_Static_assert(_Alignof(__wasi_iovec_t) == 8, "witx calculated align");
+_Static_assert(offsetof(__wasi_iovec_t, buf) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_iovec_t, buf_len) == 8, "witx calculated offset");
+#endif
+
 /**
  * A region of memory for scatter/gather writes.
  */
@@ -706,6 +730,18 @@ typedef struct __wasi_ciovec_t {
   __wasi_size_t buf_len;
 
 } __wasi_ciovec_t;
+
+#if defined(__wasm32__)
+_Static_assert(sizeof(__wasi_ciovec_t) == 8, "witx calculated size");
+_Static_assert(_Alignof(__wasi_ciovec_t) == 4, "witx calculated align");
+_Static_assert(offsetof(__wasi_ciovec_t, buf) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_ciovec_t, buf_len) == 4, "witx calculated offset");
+#elif defined(__wasm64__)
+_Static_assert(sizeof(__wasi_ciovec_t) == 16, "witx calculated size");
+_Static_assert(_Alignof(__wasi_ciovec_t) == 8, "witx calculated align");
+_Static_assert(offsetof(__wasi_ciovec_t, buf) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_ciovec_t, buf_len) == 8, "witx calculated offset");
+#endif
 
 /**
  * Relative offset within a file.
@@ -1415,6 +1451,16 @@ typedef struct __wasi_prestat_dir_t {
 
 } __wasi_prestat_dir_t;
 
+#if defined(__wasm32__)
+_Static_assert(sizeof(__wasi_prestat_dir_t) == 4, "witx calculated size");
+_Static_assert(_Alignof(__wasi_prestat_dir_t) == 4, "witx calculated align");
+_Static_assert(offsetof(__wasi_prestat_dir_t, pr_name_len) == 0, "witx calculated offset");
+#elif defined(__wasm64__)
+_Static_assert(sizeof(__wasi_prestat_dir_t) == 8, "witx calculated size");
+_Static_assert(_Alignof(__wasi_prestat_dir_t) == 8, "witx calculated align");
+_Static_assert(offsetof(__wasi_prestat_dir_t, pr_name_len) == 0, "witx calculated offset");
+#endif
+
 /**
  * Information about a pre-opened capability.
  */
@@ -1425,6 +1471,14 @@ typedef struct __wasi_prestat_t {
   uint8_t tag;
   __wasi_prestat_u_t u;
 } __wasi_prestat_t;
+
+#if defined(__wasm32__)
+_Static_assert(sizeof(__wasi_prestat_t) == 8, "witx calculated size");
+_Static_assert(_Alignof(__wasi_prestat_t) == 4, "witx calculated align");
+#elif defined(__wasm64__)
+_Static_assert(sizeof(__wasi_prestat_t) == 16, "witx calculated size");
+_Static_assert(_Alignof(__wasi_prestat_t) == 8, "witx calculated align");
+#endif
 
 /**
  * @defgroup wasi_snapshot_preview1
