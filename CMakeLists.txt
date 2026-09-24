@@ -52,7 +52,7 @@ option(CHECK_SYMBOLS "Whether or not to check the exported symbols of libc.a" OF
 set(WASI_SDK_VERSION "" CACHE STRING "Version information for wasi-sdk to embed in headers")
 option(ENABLE_WERROR "Whether to compile with `-Werror`" OFF)
 
-if(TARGET_TRIPLE MATCHES "^wasi32-")
+if(TARGET_TRIPLE MATCHES "^wasm32-")
   set(ARCH wasm32)
 elseif(TARGET_TRIPLE MATCHES "^wasm64-")
   set(ARCH wasm64)
