@@ -21,10 +21,20 @@ message(STATUS "libc-test source directory: ${LIBC_TEST}")
 include(ba-download)
 
 if(NOT ENGINE OR ENGINE STREQUAL "")
+  # Pinned, not `dev`: dev kept moving after this branch's upstream base
+  # (2026-04-23, when Wasmtime main was 45.0.0-dev), dropped wasi-threads, and
+  # changed the wasip3 ABI, so every threads and wasip3 test started failing
+  # with no change here. v45.0.0 is the release cut from that main. Threads
+  # use v44.0.0, the version upstream pins for them since wasi-threads went
+  # away (upstream then pinned everything in d060f6f).
+  set(wasmtime_version v45.0.0)
+  if (TARGET_TRIPLE MATCHES "-threads")
+    set(wasmtime_version v44.0.0)
+  endif()
   ba_download(
     wasmtime
     "https://github.com/bytecodealliance/wasmtime"
-    "dev"
+    ${wasmtime_version}
   )
   ExternalProject_Get_Property(wasmtime SOURCE_DIR)
   set(ENGINE "${SOURCE_DIR}/wasmtime")
