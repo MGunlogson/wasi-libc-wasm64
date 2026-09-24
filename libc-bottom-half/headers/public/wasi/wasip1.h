@@ -707,12 +707,14 @@ typedef struct __wasi_iovec_t {
 _Static_assert(sizeof(__wasi_iovec_t) == 8, "witx calculated size");
 _Static_assert(_Alignof(__wasi_iovec_t) == 4, "witx calculated align");
 _Static_assert(offsetof(__wasi_iovec_t, buf) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_iovec_t, buf_len) == 4, "witx calculated offset");
+_Static_assert(offsetof(__wasi_iovec_t, buf_len) == 4,
+               "witx calculated offset");
 #elif defined(__wasm64__)
 _Static_assert(sizeof(__wasi_iovec_t) == 16, "witx calculated size");
 _Static_assert(_Alignof(__wasi_iovec_t) == 8, "witx calculated align");
 _Static_assert(offsetof(__wasi_iovec_t, buf) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_iovec_t, buf_len) == 8, "witx calculated offset");
+_Static_assert(offsetof(__wasi_iovec_t, buf_len) == 8,
+               "witx calculated offset");
 #endif
 
 /**
@@ -735,12 +737,14 @@ typedef struct __wasi_ciovec_t {
 _Static_assert(sizeof(__wasi_ciovec_t) == 8, "witx calculated size");
 _Static_assert(_Alignof(__wasi_ciovec_t) == 4, "witx calculated align");
 _Static_assert(offsetof(__wasi_ciovec_t, buf) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_ciovec_t, buf_len) == 4, "witx calculated offset");
+_Static_assert(offsetof(__wasi_ciovec_t, buf_len) == 4,
+               "witx calculated offset");
 #elif defined(__wasm64__)
 _Static_assert(sizeof(__wasi_ciovec_t) == 16, "witx calculated size");
 _Static_assert(_Alignof(__wasi_ciovec_t) == 8, "witx calculated align");
 _Static_assert(offsetof(__wasi_ciovec_t, buf) == 0, "witx calculated offset");
-_Static_assert(offsetof(__wasi_ciovec_t, buf_len) == 8, "witx calculated offset");
+_Static_assert(offsetof(__wasi_ciovec_t, buf_len) == 8,
+               "witx calculated offset");
 #endif
 
 /**
@@ -1454,11 +1458,13 @@ typedef struct __wasi_prestat_dir_t {
 #if defined(__wasm32__)
 _Static_assert(sizeof(__wasi_prestat_dir_t) == 4, "witx calculated size");
 _Static_assert(_Alignof(__wasi_prestat_dir_t) == 4, "witx calculated align");
-_Static_assert(offsetof(__wasi_prestat_dir_t, pr_name_len) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_prestat_dir_t, pr_name_len) == 0,
+               "witx calculated offset");
 #elif defined(__wasm64__)
 _Static_assert(sizeof(__wasi_prestat_dir_t) == 8, "witx calculated size");
 _Static_assert(_Alignof(__wasi_prestat_dir_t) == 8, "witx calculated align");
-_Static_assert(offsetof(__wasi_prestat_dir_t, pr_name_len) == 0, "witx calculated offset");
+_Static_assert(offsetof(__wasi_prestat_dir_t, pr_name_len) == 0,
+               "witx calculated offset");
 #endif
 
 /**
