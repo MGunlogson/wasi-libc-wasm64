@@ -453,9 +453,17 @@ if (THREADS)
     musl/src/thread/wasi-threads/sem_timedwait.c
     musl/src/thread/wasi-threads/sem_trywait.c
     musl/src/thread/wasi-threads/sem_wait.c
-    musl/src/thread/${WASM_ARCH}/wasi_thread_start.s
-    musl/src/thread/${WASM_ARCH}/__wasilibc_busywait.c
+    musl/src/thread/wasi-threads/__wasilibc_busywait.c
   )
+  # The thread entry point is the one arch-specific file: the stack pointer, TLS
+  # base, start argument and lock address are all pointers, so i64 on wasm64.
+  # wasm32 keeps upstream's copy where upstream keeps it, so merges from
+  # upstream land on an untouched file.
+  if(WASM_ARCH STREQUAL "wasm64")
+    list(APPEND top_half_sources musl/src/thread/wasm64/wasi_thread_start.s)
+  else()
+    list(APPEND top_half_sources musl/src/thread/wasi-threads/wasi_thread_start.s)
+  endif()
 else()
   # pthreads stubs for single-threaded environment
   list(APPEND top_half_sources
