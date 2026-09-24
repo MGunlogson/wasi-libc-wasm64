@@ -59,7 +59,18 @@ else()
   # hardcodes `libclang_rt.builtins-wasm32.a`, which cannot serve a wasm64
   # target. Only reached when BUILTINS_LIB is not supplied; wasi-sdk's own
   # sysroot build does supply it.
-  set(builtins_lib_src ${SOURCE_DIR}/${ARCH}-unknown-wasi${WASI}/libclang_rt.builtins.a)
+  #
+  # Chosen by architecture and threading only. compiler-rt's builtins make no
+  # WASI calls, and this release's wasi, wasip1 and wasip2 archives are
+  # byte-identical per architecture; it ships none for wasip3, which is why
+  # naming the WASI version sent every wasip3 build looking for a file that
+  # does not exist. The threads archive does differ (built with atomics).
+  if(TARGET_TRIPLE MATCHES "-threads$")
+    set(builtins_target ${ARCH}-unknown-wasip1-threads)
+  else()
+    set(builtins_target ${ARCH}-unknown-wasip1)
+  endif()
+  set(builtins_lib_src ${SOURCE_DIR}/${builtins_target}/libclang_rt.builtins.a)
   set(builtins_lib_dep wasi-sdk-builtins)
 endif()
 
